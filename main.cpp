@@ -48,17 +48,7 @@ int main()
 }
 
 int index_to_x(int who, int index) { //카드판 x 위치 지정 함수
-	if (who == 1) {//나라면,
-		return 150 + 150 * index;
-	}
-	else return 200 + 100 * index; //컴퓨터면,
-}
-
-int index_to_y(int who, int index) { //카드판 y 위치 지정 함수
-	if (who == 1) {
-		return 403 - 90 * index; // 나라면
-	}
-	else return 45 + 89.5 * index; // 컴퓨터면
+	return 150 + 150 * index;
 }
 
 int myCard[14]; // 카드 개수가 14개가 넘어가면 패배처리
@@ -79,7 +69,7 @@ void play_game()
 		
 		complay = comCard[i];
 		sprintf(path, "Images/%d.png", myplay);
-		mycard[i] = Object::create(path, scene2, index_to_x(1, i), 600);
+		mycard[i] = Object::create(path, scene2, index_to_x(0, i), 600);
 	}
 
 	/* randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
