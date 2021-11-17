@@ -7,11 +7,11 @@ using namespace bangtal;
 #include <ctime>
 
 ScenePtr scene1, scene2;
-ObjectPtr mycard[14];
+ObjectPtr mycard[14],comcard[14];
 ObjectPtr start, back, randomcard;
 
-void random(int card[14]); // ½ÃÀÛÇÒ ¶§ Ä«µå¼¯±â
-void getNewcard(int card[14]); // °ÔÀÓÇÏ´Ù Ä«µå°¡ ÇÊ¿äÇÒ¶§
+void random(int card[14]); // ì‹œì‘í•  ë•Œ ì¹´ë“œì„ê¸°
+void getNewcard(int card[14]); // ê²Œì„í•˜ë‹¤ ì¹´ë“œê°€ í•„ìš”í• ë•Œ
 
 void play_game();
 
@@ -20,8 +20,8 @@ int main()
 	setGameOption(GameOption::GAME_OPTION_MESSAGE_BOX_BUTTON, false);
 	setGameOption(GameOption::GAME_OPTION_INVENTORY_BUTTON, false);
 
-	scene1 = Scene::create(" ", "images/start.png"); // ½ÃÀÛÈ­¸é
-	start = Object::create("images/startbtn.png", scene1, 600, 100); // ½ÃÀÛ¹öÆ°
+	scene1 = Scene::create(" ", "images/start.png"); // ì‹œì‘í™”ë©´
+	start = Object::create("images/startbtn.png", scene1, 600, 100); // ì‹œì‘ë²„íŠ¼
 	start->setScale(0.5f);
 
 
@@ -32,8 +32,8 @@ int main()
 		return true;
 		});
 
-	back = Object::create("images/0.png", scene2, 600, 300); // Ã³À½¿¡ Ä«µå µŞ¸é ´©¸£¸é Ä«µå ³ª´²ÁÜ
-	randomcard = Object::create("images/0.png", scene2, 1100, 300, false); // ÀÌ°É ´©¸£¸é Ä«µå¸¦ ÁÜ
+	back = Object::create("images/0.png", scene2, 600, 300); // ì²˜ìŒì— ì¹´ë“œ ë’·ë©´ ëˆ„ë¥´ë©´ ì¹´ë“œ ë‚˜ëˆ ì¤Œ
+	randomcard = Object::create("images/0.png", scene2, 1100, 300, false); // ì´ê±¸ ëˆ„ë¥´ë©´ ì¹´ë“œë¥¼ ì¤Œ
 
 	back->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		play_game();
@@ -47,38 +47,42 @@ int main()
 	return 0;
 }
 
-int index_to_x(int who, int index) { //Ä«µåÆÇ x À§Ä¡ ÁöÁ¤ ÇÔ¼ö
-	if (who == 1) {//³ª¶ó¸é,
+int index_to_x(int who, int index) { //ì¹´ë“œíŒ x ìœ„ì¹˜ ì§€ì • í•¨ìˆ˜
+	if (who == 1) {//ë‚˜ë¼ë©´,
 		return 150 + 150 * index;
 	}
-	else return 200 + 100 * index; //ÄÄÇ»ÅÍ¸é,
+	else return 200 + 100 * index; //ì»´í“¨í„°ë©´,
 }
 
-int index_to_y(int who, int index) { //Ä«µåÆÇ y À§Ä¡ ÁöÁ¤ ÇÔ¼ö
+int index_to_y(int who, int index) { //ì¹´ë“œíŒ y ìœ„ì¹˜ ì§€ì • í•¨ìˆ˜
 	if (who == 1) {
-		return 403 - 90 * index; // ³ª¶ó¸é
+		return 403 - 90 * index; // ë‚˜ë¼ë©´
 	}
-	else return 45 + 89.5 * index; // ÄÄÇ»ÅÍ¸é
+	else return 45 + 89.5 * index; // ì»´í“¨í„°ë©´
 }
 
-int myCard[14]; // Ä«µå °³¼ö°¡ 14°³°¡ ³Ñ¾î°¡¸é ÆĞ¹èÃ³¸®
-int comCard[14]; // Ä«µå °³¼ö°¡ 14°³°¡ ³Ñ¾î°¡¸é ÆĞ¹èÃ³¸®
-int myplay;
+int myCard[14]; // ì¹´ë“œ ê°œìˆ˜ê°€ 14ê°œê°€ ë„˜ì–´ê°€ë©´ íŒ¨ë°°ì²˜ë¦¬
+int comCard[14]; // ì¹´ë“œ ê°œìˆ˜ê°€ 14ê°œê°€ ë„˜ì–´ê°€ë©´ íŒ¨ë°°ì²˜ë¦¬
+int myplay, complay;
 
 void play_game()
 {
 	random(myCard);
+	random(comCard);
 	char path[40];
 
 	for (int i = 0; i < 7; i++)
 	{
-		printf("%d ", myCard[i]);
 		myplay = myCard[i];
 		sprintf(path, "Images/%d.png", myplay);
 		mycard[i] = Object::create(path, scene2, index_to_x(1, i), 100);
+		
+		complay = comCard[i];
+		sprintf(path, "Images/%d.png", myplay);
+		mycard[i] = Object::create(path, scene2, index_to_x(1, i), 600);
 	}
 
-	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+	/* randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		for (int i = 7; i < 14; i++)
 		{
 			myplay = myCard[i];
@@ -87,12 +91,13 @@ void play_game()
 		}
 		return true;
 		});
+	*/
 }
-void random(int card[14]) { // Ã¹ Ä«µå ¼¯À»¶§
+void random(int card[14]) { // ì²« ì¹´ë“œ ì„ì„ë•Œ
 	srand((unsigned int)time(NULL));
 
 	for (int i = 0; i < 20; i++) {
-		//·£´ıÇÑ ¼ö »ı¼º
+		//ëœë¤í•œ ìˆ˜ ìƒì„±
 		card[i] = rand() % 40 + 1;
 	}
 
