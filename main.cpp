@@ -9,7 +9,8 @@ using namespace bangtal;
 #define numOfCard 40
 
 ScenePtr scene1, scene2;
-ObjectPtr start, back, randomcard, end, replay;
+ObjectPtr start, back, randomcard, end, replay, banbtn;
+TimerPtr timer1 = Timer::create(1.f);
 
 ObjectPtr mycard[14], comcard[14];
 ObjectPtr stdCard;					//기준 카드
@@ -61,8 +62,8 @@ int main()
 
 	setClassMem();
 
-	back = Object::create("images/0.png", scene2, 600, 300); // 처음에 카드 뒷면 누르면 카드 나눠줌
-	randomcard = Object::create("images/0.png", scene2, 1100, 300, false); // 이걸 누르면 카드를 줌
+	back = Object::create("images/0.png", scene2, 600, 270); // 처음에 카드 뒷면 누르면 카드 나눠줌
+	randomcard = Object::create("images/0.png", scene2, 1100, 270, false); // 이걸 누르면 카드를 줌
 
 	back->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		play_game();
@@ -89,19 +90,19 @@ void play_game()
 	{
 		myCardnum[i] = mixCard[i];							//mixCard의 i번째 랜덤숫자를 myCardnum[i]에 대입
 		mycard[i] = allCard[myCardnum[i]].cardObject;		//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-		mycard[i]->locate(scene2, index_to_x(1, i), 80);	//저장한 객체멤버의 위치 조정
+		mycard[i]->locate(scene2, index_to_x(1, i), 60);	//저장한 객체멤버의 위치 조정
 		mycard[i]->show();									//객체멤버 보이기
 
 		comCardnum[i] = mixCard[i + 7];						//mixCard의 i번째 랜덤숫자를 comCardnum[i]에 대입
 		comcard[i] = allCard[comCardnum[i]].cardObject;
-		comcard[i]->locate(scene2, index_to_x(0, i), 600);
+		comcard[i]->locate(scene2, index_to_x(0, i), 500);
 		comcard[i]->setImage("images/0.png");
 		comcard[i]->show();
 	}
 
 	stdnum = mixCard[14];							//첫번째 기준카드
 	stdCard = allCard[stdnum].cardObject;
-	stdCard->locate(scene2, 600, 300);
+	stdCard->locate(scene2, 600, 270);
 	stdCard->show();
 
 	/* randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
@@ -127,8 +128,8 @@ void random(int card[40]) { // 첫 카드 섞을때
 void setClassMem() {
 	for (int i = 0; i < numOfCard; i++) {				//멤버 num 설정
 		if (i < 10) allCard[i].color = red;
-		else if (9 < i < 20) allCard[i].color = yellow;
-		else if (19 < i < 30) allCard[i].color = green;
+		else if (i > 9 && i < 20) allCard[i].color = yellow;
+		else if (i > 19 && i < 30) allCard[i].color = green;
 		else allCard[i].color = blue;
 	}
 	for (int i = 0; i < numOfCard; i++) {				//멤버 color 설정
@@ -182,7 +183,7 @@ void com_play() {
 		else {
 			comCardnum[comNull] = mixCard[nextCard];
 			comcard[comNull] = allCard[comCardnum[comNull]].cardObject;		//카드 더미에서 한장 가져감
-			comcard[comNull]->locate(scene2, index_to_x(0, comNull), 600);
+			comcard[comNull]->locate(scene2, index_to_x(0, comNull), 500);
 			comcard[comNull]->setImage("images/0.png");
 			comcard[comNull]->show();
 
@@ -215,4 +216,27 @@ void com_play() {
 	}
 
 	turn = 0;										//플레이어에게 턴을 넘김
+}
+
+void ban() {
+	timer1->setOnTimerCallback([&](TimerPtr)->bool {
+		banbtn->hide();
+		return true;
+	});
+
+	for (int i = 0; i < myNull; i++) {
+		mycard[i]->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+			if (allCard[myCardnum[i]].num != allCard[stdnum].num || allCard[myCardnum[i]].color != allCard[stdnum].color) {
+				timer1->start();
+				banbtn = Object::create("images/ban.png", scene2, 600, 200);
+			}
+			else {
+				mycard[i]->locate(scene2, 600, 300);
+				allCard[myCardnum[i]].num = allCard[stdnum].num;
+				allCard[myCardnum[i]].color = allCard[stdnum].color;
+			}
+			return true;
+		});
+	}
+	
 }
