@@ -13,8 +13,8 @@ ObjectPtr start, back, randomcard, end, replay, banbtn;
 TimerPtr timer1 = Timer::create(1.f);
 
 ObjectPtr mycard[14], comcard[14];
-ObjectPtr stdCard;					//기준 카드
-int stdnum;							//기준 카드가 가리키는 클래스 배열의 넘버
+ObjectPtr stdCard, randomCard[25];					//기준 카드, 랜덤카드더미
+int stdnum, randomnum[25];							//기준 카드, 랜덤카드가 가리키는 클래스 배열의 넘버
 int myCardnum[14], comCardnum[14];	//각자 카드가 가리키는 클래스 배열의 넘버
 int comNull = 7, myNull = 7;		//각자 카드의 개수, mycard[]와 comcard[]의 첫 빈 공간 의미.
 int mixCard[numOfCard];				//순서 섞은 카드 배열
@@ -105,18 +105,28 @@ void play_game()
 	stdCard->locate(scene2, 600, 270);
 	stdCard->show();
 
-	/* randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-		for (int i = 7; i < 14; i++)
-		{
-			myplay = myCard[i];
-			sprintf(path, "Images/%d.png", myplay);
-			mycard[i] = Object::create(path, scene2, index_to_x(1, i - 7), 20);
-		}
+	for (int i = 0; i < 25; i++) {					//랜덤카드더미
+		randomnum[i] = mixCard[15 + i];
+		randomCard[i] = allCard[randomnum[i]].cardObject;
+
+	}
+
+	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+
+		//		if (myNull == 14) endGame();
+		mycard[myNull] = randomCard[nextCard - 15];
+
+		if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
+		else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
+		mycard[myNull]->show();
+
+		myNull++;
+		nextCard++;
+
 		return true;
 		});
-	*/
 }
-void random(int card[40]) { // 첫 카드 섞을때
+void random(int card[numOfCard]) { // 첫 카드 섞을때
 	srand((unsigned int)time(NULL));
 
 	for (int i = 0; i < 40; i++) {
@@ -222,7 +232,7 @@ void ban() {
 	timer1->setOnTimerCallback([&](TimerPtr)->bool {
 		banbtn->hide();
 		return true;
-	});
+		});
 
 	for (int i = 0; i < myNull; i++) {
 		mycard[i]->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
@@ -236,7 +246,7 @@ void ban() {
 				allCard[myCardnum[i]].color = allCard[stdnum].color;
 			}
 			return true;
-		});
+			});
 	}
-	
+
 }
