@@ -132,6 +132,15 @@ void random(int card[numOfCard]) { // 첫 카드 섞을때
 	for (int i = 0; i < 40; i++) {
 		//랜덤한 수 생성
 		card[i] = rand() % numOfCard + 1;
+		// 예송 수정 -- 카드 7장 다 나오게
+		for (int sub_i = 0; sub_i < i; sub_i++)
+		{
+			if (card[i] == card[sub_i])
+			{
+				i--;
+				break;
+			}
+		}
 	}
 
 }
