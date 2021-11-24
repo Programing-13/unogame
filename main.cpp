@@ -9,8 +9,8 @@ using namespace bangtal;
 #define numOfCard 40
 
 ScenePtr scene1, scene2;
-ObjectPtr start, back, randomcard, end, replay, banbtn;
-TimerPtr timer1 = Timer::create(1.f);
+ObjectPtr start, back, randomcard, end, replay, ban, unobtn;
+TimerPtr timer1 = Timer::create(1.f) , timer2 = Timer::create(3.f);
 
 ObjectPtr mycard[14], comcard[14];
 ObjectPtr stdCard, randomCard[25];					//기준 카드, 랜덤카드더미
@@ -21,6 +21,7 @@ int mixCard[numOfCard];				//순서 섞은 카드 배열
 int nextCard = 15;					//다음에 뒤집을 카드 넘버
 
 int turn = 0;						//0:플레이어 차례, 1: 컴퓨터 차례
+bool uno = false;
 
 enum COL { red, green, blue, yellow };
 class card {					//카드 클래스: 숫자, 색깔, 이미지 오브젝트포인터를 멤버로 가짐
@@ -237,25 +238,60 @@ void com_play() {
 	turn = 0;										//플레이어에게 턴을 넘김
 }
 
-void ban() {
+
+// 정화 수정 --  숫자나 색깔 다르면 ban이미지 1초 떴다 사라지기, 같으면 기준카드로 바꾸기
+void ban_card() {
+	ban = Object::create("images/ban.png", scene2, 600, 100);
+
 	timer1->setOnTimerCallback([&](TimerPtr)->bool {
-		banbtn->hide();
+		ban->hide();
+		timer1->stop();
 		return true;
 		});
 
 	for (int i = 0; i < myNull; i++) {
 		mycard[i]->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-			if (allCard[myCardnum[i]].num != allCard[stdnum].num || allCard[myCardnum[i]].color != allCard[stdnum].color) {
+			if (allCard[stdnum].num != allCard[myCardnum[i]].num || allCard[stdnum].color != allCard[myCardnum[i]].color) {
+				timer1->set(0.1f);
 				timer1->start();
-				banbtn = Object::create("images/ban.png", scene2, 600, 200);
+				ban->show();
 			}
+
 			else {
 				mycard[i]->locate(scene2, 600, 300);
-				allCard[myCardnum[i]].num = allCard[stdnum].num;
-				allCard[myCardnum[i]].color = allCard[stdnum].color;
+				allCard[stdnum].num = allCard[myCardnum[i]].num;
+				allCard[stdnum].color = allCard[myCardnum[i]].color;
 			}
 			return true;
 			});
 	}
+}
 
+void press_uno() {
+	if (myNull == 1 || comNull == 1) uno = true;
+	unobtn = Object::create("images/.png", scene2, 600, 300,false);
+
+	if (uno == true) unobtn->show();
+	timer2->set(0.3f);
+	timer2->start();
+	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+		/* 버튼을 눌렀을 때 우노! 이미지 보여주기 */	
+		uno = false;
+		return true;
+		});
+	timer2->setOnTimerCallback([&](TimerPtr)->bool {
+		if (uno == true) {
+			mycard[myNull] = randomCard[nextCard - 15];
+
+			if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
+			else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
+			mycard[myNull]->show();
+
+			myNull++;
+			nextCard++;
+		}
+		
+		return true;
+		});
+	
 }
