@@ -241,7 +241,7 @@ void com_play() {
 
 // 정화 수정 --  숫자나 색깔 다르면 ban이미지 1초 떴다 사라지기, 같으면 기준카드로 바꾸기
 void ban_card() {
-	ban = Object::create("images/ban.png", scene2, 600, 100);
+	ban = Object::create("images/ban.png", scene2, 600, 100, false);
 
 	timer1->setOnTimerCallback([&](TimerPtr)->bool {
 		ban->hide();
@@ -279,6 +279,7 @@ void press_uno() {
 		uno = false;
 		return true;
 		});
+
 	timer2->setOnTimerCallback([&](TimerPtr)->bool {
 		if (uno == true) {
 			mycard[myNull] = randomCard[nextCard - 15];
