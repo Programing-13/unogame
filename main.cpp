@@ -99,6 +99,19 @@ void play_game()
 		comcard[i]->locate(scene2, index_to_x(0, i), 500);
 		comcard[i]->setImage("images/0.png");
 		comcard[i]->show();
+		
+		
+		mycard[i]->setOnMouseCallback([&](auto piece, auto x, auto y, auto action)->bool //예송 튕겨내기 수정
+			{
+				int index = myCardnum[i]; // mycardnum[i]가 대입되는게 맞는지...
+				printf("%d ", allCard[index].color);
+				//if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
+				//{  여기다가 잘못클릭했을때 ban_card()를 집어넣어야함
+				//	ban = Object::create("images/ban.png", scene2, 600, 100);
+				//}
+
+				return true;
+			});
 	}
 
 	stdnum = mixCard[14];							//첫번째 기준카드
