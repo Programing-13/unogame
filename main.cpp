@@ -12,8 +12,8 @@ using namespace std;
 #define numOfCard 40
 
 ScenePtr scene1, scene2, scene3;
-ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn, pressed_uno;
-TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f), timer3 = Timer::create(1.f);
+ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn;
+TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f);
 
 int comNull = 7, myNull = 7;		//각자 카드의 개수, mycard[]와 comcard[]의 첫 빈 공간 의미.
 int mixCard[numOfCard];				//순서 섞은 카드 배열
@@ -271,7 +271,7 @@ void com_play() {
 			my_play();
 		}
 	}
-	/*
+	
 	else {
 		int count = 0;			//컴퓨터가 낸 카드의 개수
 		
@@ -289,15 +289,13 @@ void com_play() {
 				count++;
 
 				if (comNull == 1) {		//한장 남으면 우노 외침
-					uno = true;
-					press_uno();
+					showMessage("UNO!");
 				}	
 			}
 		}
 		
-		string counting = to_string(count);
-		char countMessage[30];
-		sprintf(countMessage, "컴퓨터가 카드를 %d장 냈습니다.", counting);
+		char countMessage[50];
+		sprintf(countMessage, "컴퓨터가 카드를 %d장 냈습니다.", count);
 
 		if (comNull == 0) {
 			showMessage("You Lose..");
@@ -307,7 +305,7 @@ void com_play() {
 
 		count = 0;
 	}
-	*/
+	
 
 	T = 0;
 
@@ -330,15 +328,11 @@ void ban_card() {
 
 void press_uno() {
 	unobtn = Object::create("images/unobtn.png", scene2, 600, 300, false);
-	pressed_uno = Object::create("images/uno.png", scene2, 600, 300, false);
-
-	if (myNull == 1 || comNull == 1) uno = true;
-	else uno = false;
 
 	if (uno == true) {
 		unobtn->show();
 		timer2->set(3.f);
-		timer2->start();
+		timer2->start();		// 3초 안에 우노 버튼 눌러야 함
 	}
 
 	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
@@ -348,25 +342,22 @@ void press_uno() {
 		});
 
 	timer2->setOnTimerCallback([&](TimerPtr)->bool {
-		if (uno == true) {
-			myCard[myNull].cardObject->locate(scene2, 225 + 150 * (myNull - 7), 20);
+		if (uno == true) {                                       // 3초 지나고도 버튼이 눌리지 않은 상태
+			myCard[myNull] = randomCard[nextCard - 15];
+
+			if (myNull < 7) myCard[myNull].cardObject->locate(scene2, 150 + 150 * myNull, 60);
+			else myCard[myNull].cardObject->locate(scene2, 225 + 150 * (myNull - 7), 20);
 			myCard[myNull].cardObject->show();
 
 			myNull++;
 			nextCard++;
 		}
 		else {
-			timer3->set(1.f);
-			timer3->start();
-			pressed_uno->show();
+			showMessage("UNO!");
 		}
 		return true;
 		});
-
-	timer3->setOnTimerCallback([&](TimerPtr)->bool {
-		pressed_uno->hide();
-		return true;
-		});
+	
 }
 void end_game() {				//게임 종료 화면
 	restart = Object::create("images/restartbtn.png", scene2, 370, 350); // 재도전버튼
