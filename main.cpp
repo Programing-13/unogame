@@ -283,6 +283,11 @@ void my_play() {
 			return true;
 			});
 	}
+	// 정화 수정 -- press_uno() 
+	if (myNull == 1 || comNull == 1) {
+		uno = true;
+		press_uno();
+	}
 }
 void com_play() {
 	int T = 0;
@@ -360,22 +365,18 @@ void ban_card() {
 				allCard[stdnum].color = allCard[myCardnum[i]].color;
 			}
 
-			return true;
-			});
-	}*/
+	
 }
 
+// 정화 수정 -- 우노 버튼 
 void press_uno() {
 	unobtn = Object::create("images/unobtn.png", scene2, 600, 300, false);
 	pressed_uno = Object::create("images/uno.png", scene2, 600, 300, false);
 
-	if (myNull == 1 || comNull == 1) uno = true;
-	else uno = false;
-
-	if (uno == true) {
+	if (uno == true) {				//  카드 두 장 남았을 때
 		unobtn->show();
-		timer2->set(3.f);
-		timer2->start();
+		timer2->set(3.f);		
+		timer2->start();			// 3초 안에 우노 버튼 눌러야 함
 	}
 
 	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
@@ -385,26 +386,21 @@ void press_uno() {
 		});
 
 	timer2->setOnTimerCallback([&](TimerPtr)->bool {
-		if (uno == true) {
-			mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
+		if (uno == true) {													// 3초 지나고도 버튼이 눌리지 않은 상태
+			mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);	// 카드 한 장 가져가기
 			mycard[myNull]->show();
 
 			myNull++;
 			nextCard++;
 		}
 		else {
-			timer3->set(1.f);
-			timer3->start();
-			pressed_uno->show();
+			showMessage("UNO!");
 		}
-		return true;
-		});
 
-	timer3->setOnTimerCallback([&](TimerPtr)->bool {
-		pressed_uno->hide();
 		return true;
 		});
 }
+
 void end_game() {				//게임 종료 화면
 	restart = Object::create("images/restartbtn.png", scene2, 370, 350); // 재도전버튼
 	endbtn = Object::create("images/endbtn.png", scene2, 720, 350); // 끝내기버튼
