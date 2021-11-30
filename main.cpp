@@ -12,13 +12,9 @@ using namespace std;
 #define numOfCard 40
 
 ScenePtr scene1, scene2, scene3;
-ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn,pressed_uno;
+ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn, pressed_uno;
 TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f), timer3 = Timer::create(1.f);
 
-ObjectPtr mycard[14], comcard[14];
-ObjectPtr stdCard, randomCard[25];					//기준 카드, 랜덤카드더미
-int stdnum, randomnum[25];							//기준 카드, 랜덤카드가 가리키는 클래스 배열의 넘버
-int myCardnum[14], comCardnum[14];	//각자 카드가 가리키는 클래스 배열의 넘버
 int comNull = 7, myNull = 7;		//각자 카드의 개수, mycard[]와 comcard[]의 첫 빈 공간 의미.
 int mixCard[numOfCard];				//순서 섞은 카드 배열
 int nextCard = 15;					//다음에 뒤집을 카드 넘버
@@ -36,7 +32,7 @@ public:
 
 	card() {};
 };
-card allCard[numOfCard];		//모든 카드 클래스 배열 생성
+card allCard[numOfCard], stdCard, myCard[14], comCard[14], randomCard[25], emptyCard;		//모든 카드 클래스 배열, 기준카드, 플레이어카드, 컴퓨터카드, 랜덤카드더미, 카드냈을때비는자리 클래스 생성
 
 void init_game();				//게임 초기 설정
 void setClassMem();				//클래스 멤버 설정함수
@@ -57,12 +53,12 @@ int main()
 	scene2 = Scene::create(" ", "images/play.png");
 	scene3 = Scene::create(" ", "images/rule.png");
 
-	start = Object::create("images/startbtn.png", scene1, 600, 100); // 시작버튼
+	start = Object::create("images/startbtn.png", scene1, 720, 100); // 시작버튼
 	help = Object::create("images/helpbtn.png", scene1, 415, 100); //설명버튼
 
-	start->setScale(0.5f);
-	help->setScale(0.5f);
-	
+	start->setScale(0.6f);
+	help->setScale(0.65f);
+
 	start->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		scene2->enter();
 		return true;
@@ -77,21 +73,6 @@ int main()
 
 	init_game();
 	startGame(scene1);
-
-	//setClassMem();
-
-	/*back = Object::create("images/0.png", scene2, 600, 270); // 처음에 카드 뒷면 누르면 카드 나눠줌
-	randomcard = Object::create("images/0.png", scene2, 1100, 270, false); // 이걸 누르면 카드를 줌
-
-	back->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-		play_game();
-		back->hide();
-		randomcard->show();
-		return true;
-		});
-
-	startGame(scene1);*/
-
 
 	return 0;
 }
@@ -113,13 +94,13 @@ void init_game() {
 
 }
 void setClassMem() {
-	for (int i = 0; i < numOfCard; i++) {				//멤버 num 설정
+	for (int i = 0; i < numOfCard; i++) {				//멤버 color 설정
 		if (i < 10) allCard[i].color = red;
 		else if (i > 9 && i < 20) allCard[i].color = yellow;
 		else if (i > 19 && i < 30) allCard[i].color = green;
 		else allCard[i].color = blue;
 	}
-	for (int i = 0; i < numOfCard; i++) {				//멤버 color 설정
+	for (int i = 0; i < numOfCard; i++) {				//멤버 num 설정
 		switch (i % 10) {
 		case 0:
 			allCard[i].num = 0;
@@ -163,64 +144,33 @@ void setClassMem() {
 int index_to_x(int who, int index) { //카드판 x 위치 지정 함수
 	return 150 + 150 * index;
 }
-
 void play_game()
 {
 	random(mixCard);			//mixCard[40]에 랜덤 숫자 40개 저장, 0~6:mycard, 7~13:comcard, 14:첫번째 stdcard
 
-	for (int i = 0; i < 7; i++)
-	{
-		myCardnum[i] = mixCard[i];							//mixCard의 i번째 랜덤숫자를 myCardnum[i]에 대입
-		mycard[i] = allCard[myCardnum[i]].cardObject;		//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-		mycard[i]->locate(scene2, index_to_x(1, i), 60);	//저장한 객체멤버의 위치 조정
-		mycard[i]->show();									//객체멤버 보이기
 
-		comCardnum[i] = mixCard[i + 7];						//mixCard의 i번째 랜덤숫자를 comCardnum[i]에 대입
-		comcard[i] = allCard[comCardnum[i]].cardObject;
-		comcard[i]->locate(scene2, index_to_x(0, i), 500);
-		comcard[i]->setImage("images/0.png");
-		comcard[i]->show();
-
-
-		/*mycard[i]->setOnMouseCallback([&](auto piece, auto x, auto y, auto action)->bool //예송 튕겨내기 수정
-			{
-				int index = myCardnum[i]; // mycardnum[i]가 대입되는게 맞는지...
-				printf("%d ", allCard[index].color);
-				//if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
-				//{  여기다가 잘못클릭했을때 ban_card()를 집어넣어야함
-				//	ban = Object::create("images/ban.png", scene2, 600, 100);
-				//}
-
-				return true;
-			});*/
+	for (int i = 0; i < 7; i++)	//카드분배하기
+	{									
+		myCard[i] = allCard[mixCard[i]-1];		
+		myCard[i].cardObject->locate(scene2, index_to_x(1, i), 60);		//**예외발생
+		myCard[i].cardObject->show();								
+								
+		comCard[i]= allCard[mixCard[i + 7] - 1];
+		comCard[i].cardObject->locate(scene2, index_to_x(0, i), 500);	//**예외발생
+		comCard[i].cardObject->setImage("images/0.png");
+		comCard[i].cardObject->show();									
 	}
 
-	stdnum = mixCard[14];							//첫번째 기준카드
-	stdCard = allCard[stdnum].cardObject;
-	stdCard->locate(scene2, 600, 270);
-	stdCard->show();
+	stdCard = allCard[mixCard[14] - 1];							//첫번째 기준카드
+	stdCard.cardObject->locate(scene2, 600, 270);
+	stdCard.cardObject->show();
 
-	for (int i = 0; i < 25; i++) {					//랜덤카드더미
-		randomnum[i] = mixCard[15 + i];
-		randomCard[i] = allCard[randomnum[i]].cardObject;
-
+	for (int i = 0; i < 25; i++) {						//랜덤카드더미
+		randomCard[i] = allCard[mixCard[i + 15] - 1];
+		randomCard[i].cardObject->hide();
 	}
 }
-/*	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 
-		//		if (myNull == 14) endGame();
-		mycard[myNull] = randomCard[nextCard - 15];
-
-		if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-		else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-		mycard[myNull]->show();
-
-		myNull++;
-		nextCard++;
-
-		return true;
-		});
-}*/
 void random(int card[numOfCard]) { // 첫 카드 섞을때
 	srand((unsigned int)time(NULL));
 
@@ -239,8 +189,9 @@ void random(int card[numOfCard]) { // 첫 카드 섞을때
 	}
 
 }
+
 void my_play() {
-	if (takeCardCount == 0) {		//카드 가져오기=>이전에 카드를 내지 않았을 때
+	if (takeCardCount == 0) {		//이전에 카드를 내지 않았을 때 카드 가져오기
 		randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 
 			if (myNull == 14) {
@@ -249,16 +200,16 @@ void my_play() {
 			}
 
 			else if (keepCardCount == 0) {		//가져온 카드가 없다면 카드 가져올수있도록
-				mycard[myNull] = randomCard[nextCard - 15];
+				myCard[myNull] = randomCard[nextCard - 15];
 
-				if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-				else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-				mycard[myNull]->show();
+				if (myNull < 7) myCard[myNull].cardObject->locate(scene2, 150 + 150 * myNull, 60);
+				else myCard[myNull].cardObject->locate(scene2, 225 + 150 * (myNull - 7), 20);
+				myCard[myNull].cardObject->show();
 
 				myNull++;
 				nextCard++;
 
-				keepCardCount = 1;		//end_game이 오류없이 잘 작동하면 주석 풀기.
+				keepCardCount = 1;
 				com_play();
 			}
 
@@ -266,46 +217,53 @@ void my_play() {
 			});
 	}
 
-
-	//ban_card 소영 수정 
-	for (int i = 0; i < myNull; i++) {
-		mycard[i]->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-			if (allCard[stdnum].num != allCard[myCardnum[i]].num || allCard[stdnum].color != allCard[myCardnum[i]].color) ban_card();
+/*
+	for (int i = 0; i < myNull; i++) {		//카드 내기
+		myCard[i].cardObject->setOnMouseCallback([&](auto, auto, auto, auto)->bool {		//**오류부분!!!! => 교수님께 여쭤보기
+			if (stdCard.num != myCard[i].num && stdCard.color != myCard[i].color) end_game();//ban_card(); =>end_game은 작동 확인용
 			else {
-				stdnum = myCardnum[i];
-				stdCard = allCard[stdnum].cardObject;
+				stdCard = myCard[i];
 
-				for (int j = 0; j < myNull - i; j++) {	//갖고 있던 카드들 배열 앞으로 땡기기
-					myCardnum[i] = myCardnum[i + 1];
-					mycard[i] = allCard[myCardnum[i]].cardObject;
+				for (int j = 0; j < myNull - i + 1; j++) {	//갖고 있던 카드들 배열 앞으로 땡기기
+					myCard[i] = myCard[i + 1];
 				}
+				myCard[myNull - 1] = emptyCard;		//끝자리 비우기
+				
+				myNull--;
+				takeCardCount = 1;
+
+				if (myNull == 1) {		//한장 남으면 우노 외침
+					uno = true;
+					press_uno();
+				}
+
+				//카드 내기 완료 버튼 추가해야함
 			}
+			
 			return true;
 			});
 	}
-	// 정화 수정 -- press_uno() 
-	if (myNull == 1 || comNull == 1) {
-		uno = true;
-		press_uno();
-	}
+	*/
 }
 void com_play() {
 	int T = 0;
-	for (int i = 0; i < comNull; i++) {			//색과 숫자가 모두 다르면
-		allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color;
-		T++;
+	for (int i = 0; i < comNull; i++) {			//색과 숫자가 모두 다르면 한장 가져간다.
+		if (stdCard.num != comCard[i].num && stdCard.color != comCard[i].color) T++;
 	}
-	if (T == comNull) {							//한장 가져간다.
-		if (comNull == 14) {		//14장 넘어가면 게임종료
+
+	if (T == comNull) {							
+		if (comNull == 14) {			//14장 넘어가면 게임종료
 			showMessage("You Win!!");
 			end_game();
 		}
-		else {
-			comCardnum[comNull] = mixCard[nextCard];
-			comcard[comNull] = allCard[comCardnum[comNull]].cardObject;		//카드 더미에서 한장 가져감
-			comcard[comNull]->locate(scene2, index_to_x(0, comNull), 500);
-			comcard[comNull]->setImage("images/0.png");
-			comcard[comNull]->show();
+		else {								
+			comCard[comNull] = randomCard[nextCard - 15];
+
+			if (comNull < 7) comCard[comNull].cardObject->locate(scene2, 150 + 150 * comNull, 500);
+			else comCard[comNull].cardObject->locate(scene2, 225 + 150 * (comNull - 7), 540);
+
+			comCard[comNull].cardObject->setImage("images/0.png");
+			comCard[comNull].cardObject->show();
 			showMessage("컴퓨터가 한장 가져갔습니다.");
 
 			comNull++;
@@ -313,70 +271,74 @@ void com_play() {
 			my_play();
 		}
 	}
-	T = 0;
+	/*
+	else {
+		int count = 0;			//컴퓨터가 낸 카드의 개수
+		
+		for (int i = 0; i < comNull; i++) {				//색과 숫자 중 하나가 같으면
+			if (stdCard.num == comCard[i].num || stdCard.color == comCard[i].color) {
+				stdCard = comCard[i];		//기준카드를 해당 카드로 변경
 
-	for (int i = 0; i < comNull; i++) {				//색과 숫자 중 하나가 같으면
-		if (allCard[stdnum].num == allCard[comCardnum[i]].num || allCard[stdnum].color == allCard[comCardnum[i]].color) {
-			stdnum = comCardnum[i];
-			stdCard = allCard[stdnum].cardObject;	//기준카드를 해당 카드로 변경
+				for (int j = 0; j < comNull - i + 1; j++) {	//갖고 있던 카드들 배열 앞으로 땡기기
+					comCard[i] = comCard[i + 1];
+				}
 
-			for (int j = 0; j < comNull - i; j++) {	//갖고 있던 카드들 배열 앞으로 땡기기
-				comCardnum[i] = comCardnum[i + 1];
-				comcard[i] = allCard[comCardnum[i]].cardObject;
-			}
+				comCard[comNull - 1].cardObject->hide();			//마지막 카드자리 숨김
+				
+				comNull--;								//comcard의 개수 1 감소
+				count++;
 
-			comcard[comNull - 1]->hide();			//마지막 카드자리 숨김
-			comNull--;								//comcard의 개수 1 감소
-
-			if (comNull == 1) showMessage("UNO!!");	//한장 남으면 우노 외침
-			if (comNull == 0) {
-				showMessage("You Lose..");
-				//replay->show();
-				//end->show();
+				if (comNull == 1) {		//한장 남으면 우노 외침
+					uno = true;
+					press_uno();
+				}	
 			}
 		}
-	}
+		
+		string counting = to_string(count);
+		char countMessage[30];
+		sprintf(countMessage, "컴퓨터가 카드를 %d장 냈습니다.", counting);
 
-	my_play();			//플레이어에게 턴을 넘김
+		if (comNull == 0) {
+			showMessage("You Lose..");
+			end_game();
+		}
+		else showMessage(countMessage);
+
+		count = 0;
+	}
+	*/
+
+	T = 0;
+
+	keepCardCount = 0;
+	my_play();
 }
 
-
-//  --  숫자나 색깔 다르면 ban이미지 1초 떴다 사라지기, 같으면 기준카드로 바꾸기
 void ban_card() {
 	ban = Object::create("images/ban.png", scene2, 600, 100, false);
 
-	timer1->setOnTimerCallback([&](TimerPtr)->bool {		
+	timer1->setOnTimerCallback([&](TimerPtr)->bool {
 		timer1->set(0.1f);
 		ban->hide();
 		return true;
 		});
-
-/*	for (int i = 0; i < myNull; i++) {
-		mycard[i]->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-			if ((allCard[stdnum].num != allCard[myCardnum[i]].num) || (allCard[stdnum].color != allCard[myCardnum[i]].color)) { */
-				timer1->set(1.0f);
-				timer1->start();
-				ban->show();
-		/*	}
-
-			else {
-				mycard[i]->locate(scene2, 600, 300);					// 내 카드가 기준카드가 되기
-				allCard[stdnum].num = allCard[myCardnum[i]].num;
-				allCard[stdnum].color = allCard[myCardnum[i]].color;
-			}
-
-	
+	timer1->set(0.1f);
+	timer1->start();
+	ban->show();
 }
 
-// 정화 수정 -- 우노 버튼 
 void press_uno() {
 	unobtn = Object::create("images/unobtn.png", scene2, 600, 300, false);
 	pressed_uno = Object::create("images/uno.png", scene2, 600, 300, false);
 
-	if (uno == true) {				//  카드 두 장 남았을 때
+	if (myNull == 1 || comNull == 1) uno = true;
+	else uno = false;
+
+	if (uno == true) {
 		unobtn->show();
-		timer2->set(3.f);		
-		timer2->start();			// 3초 안에 우노 버튼 눌러야 함
+		timer2->set(3.f);
+		timer2->start();
 	}
 
 	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
@@ -386,21 +348,26 @@ void press_uno() {
 		});
 
 	timer2->setOnTimerCallback([&](TimerPtr)->bool {
-		if (uno == true) {													// 3초 지나고도 버튼이 눌리지 않은 상태
-			mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);	// 카드 한 장 가져가기
-			mycard[myNull]->show();
+		if (uno == true) {
+			myCard[myNull].cardObject->locate(scene2, 225 + 150 * (myNull - 7), 20);
+			myCard[myNull].cardObject->show();
 
 			myNull++;
 			nextCard++;
 		}
 		else {
-			showMessage("UNO!");
+			timer3->set(1.f);
+			timer3->start();
+			pressed_uno->show();
 		}
+		return true;
+		});
 
+	timer3->setOnTimerCallback([&](TimerPtr)->bool {
+		pressed_uno->hide();
 		return true;
 		});
 }
-
 void end_game() {				//게임 종료 화면
 	restart = Object::create("images/restartbtn.png", scene2, 370, 350); // 재도전버튼
 	endbtn = Object::create("images/endbtn.png", scene2, 720, 350); // 끝내기버튼
@@ -419,14 +386,16 @@ void end_game() {				//게임 종료 화면
 
 		restart->hide();
 		endbtn->hide();
-		back->hide();        // 깔끔하게 보이기 위해 back카드 외에 다 안보이게 지움.
-		randomcard->hide();
-		
-		for (int i =0; i<7; i++)          
-		{
-			mycard[i]->hide();
-			comcard[i]->hide();
+
+		for (int i = 0; i < myNull; i++) {
+			myCard[i].cardObject->hide();
 		}
+		for (int i = 0; i < comNull; i++) {
+			comCard[i].cardObject->hide();
+		}
+
+		stdCard.cardObject->hide();
+		randomcard->hide();
 
 		comNull = 7;
 		myNull = 7;
