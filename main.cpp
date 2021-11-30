@@ -61,7 +61,7 @@ int main()
 	help = Object::create("images/helpbtn.png", scene1, 415, 100); //설명버튼
 
 	start->setScale(0.5f);
-	help->setScale(0.65f);
+	help->setScale(0.5f);
 	
 	start->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		scene2->enter();
@@ -419,6 +419,14 @@ void end_game() {				//게임 종료 화면
 
 		restart->hide();
 		endbtn->hide();
+		back->hide();        // 깔끔하게 보이기 위해 back카드 외에 다 안보이게 지움.
+		randomcard->hide();
+		
+		for (int i =0; i<7; i++)          
+		{
+			mycard[i]->hide();
+			comcard[i]->hide();
+		}
 
 		comNull = 7;
 		myNull = 7;
