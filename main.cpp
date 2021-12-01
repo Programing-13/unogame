@@ -12,7 +12,7 @@ using namespace std;
 #define numOfCard 40
 
 ScenePtr scene1, scene2, scene3;
-ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn;
+ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn, keptComCard[14];
 TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f);
 
 int comNull = 7, myNull = 7;		//각자 카드의 개수, mycard[]와 comcard[]의 첫 빈 공간 의미.
@@ -81,6 +81,9 @@ void init_game() {
 
 	back = Object::create("images/0.png", scene2, 600, 270); // 처음에 카드 뒷면 누르면 카드 나눠줌
 	randomcard = Object::create("images/0.png", scene2, 1100, 270, false); // 이걸 누르면 카드를 줌
+	for (int i = 0; i < 14; i++) {
+		keptComCard[i] = Object::create("images/0.png", scene2, 0, 0, false);
+	}
 
 	setClassMem();
 	back->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
@@ -156,9 +159,9 @@ void play_game()
 		myCard[i].cardObject->show();								
 								
 		comCard[i]= allCard[mixCard[i + 7] - 1];
-		comCard[i].cardObject->locate(scene2, index_to_x(0, i), 500);	//**예외발생
-		comCard[i].cardObject->setImage("images/0.png");
-		comCard[i].cardObject->show();									
+
+		keptComCard[i]->locate(scene2, index_to_x(0, i), 500);
+		keptComCard[i]->show();
 	}
 
 	stdCard = allCard[mixCard[14] - 1];							//첫번째 기준카드
@@ -220,7 +223,7 @@ void my_play() {
 /*
 	for (int i = 0; i < myNull; i++) {		//카드 내기
 		myCard[i].cardObject->setOnMouseCallback([&](auto, auto, auto, auto)->bool {		//**오류부분!!!! => 교수님께 여쭤보기
-			if (stdCard.num != myCard[i].num && stdCard.color != myCard[i].color) end_game();//ban_card(); =>end_game은 작동 확인용
+			if (stdCard.num != myCard[i].num && stdCard.color != myCard[i].color) ban_card();
 			else {
 				stdCard = myCard[i];
 
@@ -259,11 +262,10 @@ void com_play() {
 		else {								
 			comCard[comNull] = randomCard[nextCard - 15];
 
-			if (comNull < 7) comCard[comNull].cardObject->locate(scene2, 150 + 150 * comNull, 500);
-			else comCard[comNull].cardObject->locate(scene2, 225 + 150 * (comNull - 7), 540);
-
-			comCard[comNull].cardObject->setImage("images/0.png");
-			comCard[comNull].cardObject->show();
+			if (comNull < 7) keptComCard[comNull]->locate(scene2, 150 + 150 * comNull, 500);
+			else keptComCard[comNull]->locate(scene2, 225 + 150 * (comNull - 7), 540);
+			keptComCard[comNull]->show();
+			
 			showMessage("컴퓨터가 한장 가져갔습니다.");
 
 			comNull++;
@@ -279,12 +281,8 @@ void com_play() {
 			if (stdCard.num == comCard[i].num || stdCard.color == comCard[i].color) {
 				stdCard = comCard[i];		//기준카드를 해당 카드로 변경
 
-				for (int j = 0; j < comNull - i + 1; j++) {	//갖고 있던 카드들 배열 앞으로 땡기기
-					comCard[i] = comCard[i + 1];
-				}
+				keptComCard[comNull - 1]->hide();
 
-				comCard[comNull - 1].cardObject->hide();			//마지막 카드자리 숨김
-				
 				comNull--;								//comcard의 개수 1 감소
 				count++;
 
