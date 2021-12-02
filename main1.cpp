@@ -163,7 +163,8 @@ void random_card()
 		printf("%d ", mixCard[i]);
 		myCardnum[i] = mixCard[i]; //mixCard의 i번째 랜덤숫자를 myCardnum[i]에 대입
 		mycard[i] = allCard[myCardnum[i]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-		mycard[i]->locate(scene2, index_to_x(1, i), 60); //저장한 객체멤버의 위치 조정
+		mycard[i]->setScale(0.8f);
+		mycard[i]->locate(scene2, index_to_x(1, i), 140); //저장한 객체멤버의 위치 조정
 		mycard[i]->show(); //객체멤버 보이기
 
 		comCardnum[i] = mixCard[i + 7]; //mixCard의 i번째 랜덤숫자를 comCardnum[i]에 대입
@@ -231,6 +232,7 @@ void my_play() {
 
 				if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
 				else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
+				mycard[i]->setScale(0.8f);
 				mycard[myNull]->show();
 
 				myNull++;
