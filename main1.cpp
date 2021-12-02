@@ -212,44 +212,11 @@ void random(int card[numOfCard]) { // 첫 카드 섞을때
 
 void play_game()
 {
+
 	random_card();
+	showMessage("나부터 플레이합니다.");
+	my_play();
 
-
-	// 여기서 컴퓨터 / 나로 플레이어 지정해주는 함수만 집어넣고
-	// myplay와 complay에서 관련함수 구현
-	//for (int i = 0; i < 7; i++)
-	//{
-
-	// mycard[i]->setOnMouseCallback([&](auto piece, auto x, auto y, auto action)->bool //예송 튕겨내기 수정
-	// {
-	// end_game();
-	// return true;
-	// });
-
-	// 이거 코드 베이스로 나머지도 바꾸면 됩니다!!
-	for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨
-		mycard[i]->setOnMouseCallback([&,i](auto, auto, auto, auto)->bool {
-			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
-			{
-				stdCard->hide();
-				stdnum = myCardnum[i];
-				printf("%d", stdnum);
-				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
-				stdCard->locate(scene2, 600, 270);
-				stdCard->show();
-
-				for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
-					myCardnum[i] = myCardnum[i + 1];
-					mycard[i] = allCard[myCardnum[i]].cardObject;
-				}
-			}
-				
-			else {
-				ban_card();
-			}
-			return true;
-			});
-	}
 	 
 }
 
@@ -280,24 +247,30 @@ void my_play() {
 			});
 	}
 
-
-	//ban_card 소영 수정
-	for (int i = 0; i < myNull; i++) {
-		mycard[i]->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-			if (allCard[stdnum].num != allCard[myCardnum[i]].num || allCard[stdnum].color != allCard[myCardnum[i]].color) ban_card();
-			else {
+	for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨
+		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
+			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
+			{
+				stdCard->hide();
 				stdnum = myCardnum[i];
-				stdCard = allCard[stdnum].cardObject;
+				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
+				stdCard->locate(scene2, 600, 270);
+				stdCard->show();
 
 				for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
 					myCardnum[i] = myCardnum[i + 1];
 					mycard[i] = allCard[myCardnum[i]].cardObject;
 				}
 			}
+
+			else {
+				ban_card();
+			}
 			return true;
 			});
 	}
 }
+
 void com_play() {
 	int T = 0;
 	for (int i = 0; i < comNull; i++) { //색과 숫자가 모두 다르면
