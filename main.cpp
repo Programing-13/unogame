@@ -154,17 +154,17 @@ void play_game()
 
 	for (int i = 0; i < 7; i++)	//카드분배하기
 	{									
-		myCard[i] = allCard[mixCard[i]-1];		
+		myCard[i] = allCard[mixCard[i]];		
 		myCard[i].cardObject->locate(scene2, index_to_x(1, i), 60);		//**예외발생
 		myCard[i].cardObject->show();								
 								
-		comCard[i]= allCard[mixCard[i + 7] - 1];
+		comCard[i]= allCard[mixCard[i + 7]];
 
 		keptComCard[i]->locate(scene2, index_to_x(0, i), 500);
 		keptComCard[i]->show();
 	}
 
-	stdCard = allCard[mixCard[14] - 1];							//첫번째 기준카드
+	stdCard = allCard[mixCard[14]];							//첫번째 기준카드
 	stdCard.cardObject->locate(scene2, 600, 270);
 	stdCard.cardObject->show();
 
