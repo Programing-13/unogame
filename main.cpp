@@ -12,8 +12,8 @@ using namespace std;
 #define numOfCard 40
 
 ScenePtr scene1, scene2, scene3;
-ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn, keptComCard[14];
-TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f);
+ObjectPtr start, back, randomcard, nextbtn, endbtn, restart, help, ban, unobtn, keptComCard[14];
+TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f), playerTimer;
 
 int comNull = 7, myNull = 7;		//각자 카드의 개수, mycard[]와 comcard[]의 첫 빈 공간 의미.
 int mixCard[numOfCard];				//순서 섞은 카드 배열
@@ -192,8 +192,7 @@ void random(int card[numOfCard]) { // 첫 카드 섞을때
 	}
 
 }
-
-void my_play() {
+void keepCard() {
 	if (takeCardCount == 0) {		//이전에 카드를 내지 않았을 때 카드 가져오기
 		randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 
@@ -213,12 +212,30 @@ void my_play() {
 				nextCard++;
 
 				keepCardCount = 1;
+				/*
+				playerTimer->stop();
+				hideTimer();
+				playerTimer->set(15.f);
+				*/
 				com_play();
 			}
 
 			return true;
 			});
 	}
+}
+void my_play() {
+	/*
+	playerTimer = Timer::create(15.f);
+	showTimer(playerTimer);					//15초 시간제한 **오류
+	playerTimer->setOnTimerCallback([&](TimerPtr)->bool {
+		keepCard();
+		return true;
+		});
+
+	playerTimer->start();
+*/
+	keepCard();
 
 /*
 	for (int i = 0; i < myNull; i++) {		//카드 내기
@@ -240,7 +257,16 @@ void my_play() {
 					press_uno();
 				}
 
-				//카드 내기 완료 버튼 추가해야함
+				nextbtn = Object::create("images/next.png", scene2, 1100, 270);
+				nextbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+					playerTimer->stop();
+					hideTimer();
+					playerTimer->set(15.f);
+
+					com_play();
+					
+					return true;
+					});
 			}
 			
 			return true;
