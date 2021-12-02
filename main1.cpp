@@ -12,7 +12,7 @@ using namespace std;
 #define numOfCard 40
 
 ScenePtr scene1, scene2, scene3, scene4;
-ObjectPtr start, back, randomcard, endbtn, restart, help, ban, unobtn, pressed_uno;
+ObjectPtr start, back, randomcard, endbtn, nextbtn, restart, help, ban, unobtn, pressed_uno;
 TimerPtr timer1 = Timer::create(1.f), timer2 = Timer::create(3.f), timer3 = Timer::create(1.f);
 
 ObjectPtr mycard[14], comcard[14];
@@ -221,6 +221,10 @@ void play_game()
 }
 
 void my_play() {
+
+	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
+
+
 	if (takeCardCount == 0) { //카드 가져오기=>이전에 카드를 내지 않았을 때
 		randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 
@@ -247,6 +251,7 @@ void my_play() {
 			});
 	}
 
+
 	for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨
 		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
 			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
@@ -256,6 +261,8 @@ void my_play() {
 				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
 				stdCard->locate(scene2, 600, 270);
 				stdCard->show();
+				nextbtn->show();
+
 
 				for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
 					myCardnum[i] = myCardnum[i + 1];
@@ -269,6 +276,17 @@ void my_play() {
 			return true;
 			});
 	}
+
+	nextbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+		/*playerTimer->stop();
+		hideTimer();
+		playerTimer->set(15.f);*/
+		nextbtn->hide();
+		com_play();
+
+
+		return true;
+		});
 }
 
 void com_play() {
