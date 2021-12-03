@@ -41,7 +41,7 @@ card allCard[numOfCard]; //모든 카드 클래스 배열 생성
 
 void init_game(); //게임 초기 설정
 void setClassMem(); //클래스 멤버 설정함수
-void random(int card[numOfCard]); // 시작할 때 카드섞기
+void random(int card[numOfCard]); //시작할 때 카드섞기
 
 void random_card();
 void play_game();
@@ -231,30 +231,38 @@ void play_game()
 
 void my_play() {
 
+	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
 	playerTimer = Timer::create(15.f);
 	showTimer(playerTimer);
+	playerTimer->set(15.f);
 	playerTimer->start();
 	playerTimer->setOnTimerCallback([&](TimerPtr)->bool {
-		cardslide->play();
-		mycard[myNull] = randomCard[nextCard - 15];
+		if (takeCardCount == 0) {		//이전에 카드를 내지 않았으면 카드 가져감
+			cardslide->play();
 
-		if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-		else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-		mycard[myNull]->show();
+			allCard[myCardnum[myNull]] = allCard[mixCard[nextCard]];
+			mycard[myNull] = allCard[myCardnum[myNull]].cardObject;
 
-		myNull++;
-		nextCard++;
+			if (myNull < 7)	//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+				mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
+			else            //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+				mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
 
-		keepCardCount = 1; //end_game이 오류없이 잘 작동하면 주석 풀기.
+			mycard[myNull]->setScale(0.8f);
+			mycard[myNull]->show();
+
+			myNull++;
+			nextCard++;
+
+		}
+		playerTimer->stop();
 		com_play();
 		return true;
 		});
 
-	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
-
 	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		printf("mynull : %d ", myNull);
-		
+
 		if (myNull == 14) {
 			bgm->stop();
 			playerTimer->stop();
@@ -265,24 +273,20 @@ void my_play() {
 
 		else { //가져온 카드가 없다면 카드 가져올수있도록
 			playerTimer->stop();
-			mycard[myNull] = randomCard[nextCard - 15];
+			allCard[myCardnum[myNull]] = allCard[mixCard[nextCard]];
+			mycard[myNull] = allCard[myCardnum[myNull]].cardObject;
 
-			if (myNull < 7)
-			{
-				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+			if (myNull < 7)	//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
 				mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-			}
-			else
-			{
-				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+			else            //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
 				mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-			}
+			
 			mycard[myNull]->setScale(0.8f);
 			mycard[myNull]->show();
 
 			myNull++;
 			nextCard++;
-			
+
 			com_play();
 		}
 
@@ -311,10 +315,9 @@ void my_play() {
 				}
 
 				myNull--;
+				takeCardCount = 1;
 
 				if (myNull == 1) {		//한장 남으면 우노 외침
-					playerTimer->stop();
-					uno = true;
 					press_uno();
 				}
 				else if (myNull == 0) {	//카드를 모두 내면 이김
@@ -342,7 +345,6 @@ void my_play() {
 			//		mycard[i] = allCard[myCardnum[i]].cardObject;
 			//	}
 			//}
-
 			else ban_card();
 			return true;
 			});
@@ -351,7 +353,6 @@ void my_play() {
 	nextbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		playerTimer->stop();
 		hideTimer();
-		playerTimer->set(15.f);
 		nextbtn->hide();
 		com_play();
 
@@ -362,6 +363,7 @@ void my_play() {
 }
 
 void com_play() {
+	nextbtn->hide();
 	int T = 0;
 	for (int i = 0; i < comNull; i++) { //색과 숫자가 모두 다르면
 		if (allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color)
@@ -372,7 +374,6 @@ void com_play() {
 		if (comNull == 14) { //14장 넘어가면 게임종료
 			bgm->stop();
 			win->play();
-			playerTimer->stop();
 			showMessage("You Win!!");
 			end_game();
 		}
@@ -388,7 +389,7 @@ void com_play() {
 
 			comNull++;
 			nextCard++; //comcard의 개수와 다음 뒤집을 카드 넘버 1씩 증가
-			playerTimer->set(15.f);
+			
 			my_play();
 		}
 	}
@@ -421,7 +422,7 @@ void com_play() {
 		if (comNull == 0) {
 			bgm->stop();
 			lose->play();
-			playerTimer->stop();
+			
 			showMessage("You Lose..");
 			end_game();
 		}
@@ -447,7 +448,7 @@ void ban_card() {
 		ban->hide();
 		return true;
 		});
-	
+
 }
 
 void press_uno() {
@@ -458,34 +459,35 @@ void press_uno() {
 
 	showTimer(unoTimer);
 	unoTimer->start();		// 3초 안에 우노 버튼 눌러야 함
-	
+
 	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		unoTimer->stop();
+		hideTimer();
+		unoTimer->set(3.f);
 		unobtn->hide();
 		unoeffect->play();
-		showMessage("UNO!");
 		uno = false;
 		showTimer(playerTimer);
-		com_play();
 		return true;
 		});
 
-	unoTimer->setOnTimerCallback([&](TimerPtr)->bool {
+	unoTimer->setOnTimerCallback([&](TimerPtr)->bool {  
 		if (uno == true) {    // 3초 지나고도 버튼이 눌리지 않은 상태
+			unoTimer->stop();
+			hideTimer();
+			unoTimer->set(3.f);
 			unobtn->hide();
+			nextbtn->hide();
 			cardslide->play();
-			mycard[myNull] = randomCard[nextCard - 15];
+			
+			allCard[myCardnum[myNull]] = allCard[mixCard[nextCard]];
+			mycard[myNull] = allCard[myCardnum[myNull]].cardObject;
 
-			if (myNull < 7)
-			{
-				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+			if (myNull < 7)	//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
 				mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-			}
-			else
-			{
-				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+			else            //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
 				mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-			}
+
 			mycard[myNull]->setScale(0.8f);
 			mycard[myNull]->show();
 
@@ -502,13 +504,13 @@ void press_uno() {
 
 void end_game() { //게임 종료 화면
 	bgm->stop();
+	playerTimer->stop();
+	nextbtn->hide();
 
 	restart = Object::create("images/restartbtn.png", scene2, 370, 350); // 재도전버튼
 	endbtn = Object::create("images/endbtn.png", scene2, 720, 350); // 끝내기버튼
 	restart->setScale(0.8f);
 	endbtn->setScale(0.8f);
-
-	playerTimer->stop();
 
 	endbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		endGame();
