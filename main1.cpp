@@ -503,7 +503,7 @@ void end_game() { //게임 종료 화면
 			mycard[i]->hide();
 		}
 		for (int i = 0; i < comNull; i++) {
-			comcard[i]->hide();
+			keptComCard[i]->hide();
 		}
 
 
