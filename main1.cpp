@@ -273,7 +273,7 @@ void my_play() {
 void com_play() {
 	int T = 0;
 	for (int i = 0; i < comNull; i++) { //색과 숫자가 모두 다르면
-		if(allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color);
+		if(allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color)
 			T++;
 	}
 	if (T == comNull) { //한장 가져간다.
@@ -282,8 +282,7 @@ void com_play() {
 			end_game();
 		}
 		else {
-			comCardnum[comNull] = mixCard[nextCard];
-			//comcard[comNull] = allCard[comCardnum[comNull]].cardObject; //카드 더미에서 한장 가져감
+			allCard[comCardnum[comNull]] = allCard[mixCard[nextCard]];	//카드 더미에서 한장 가져감
 			
 			if (comNull < 7) keptComCard[comNull]->locate(scene2, 150 + 150 * comNull, 500);
 			else keptComCard[comNull]->locate(scene2, 225 + 150 * (comNull - 7), 540);
@@ -303,11 +302,10 @@ void com_play() {
 			if (allCard[stdnum].num == allCard[comCardnum[i]].num || allCard[stdnum].color == allCard[comCardnum[i]].color) {
 		
 				stdCard->hide();
-				allCard[stdnum].num = allCard[comCardnum[i]].num;
-				allCard[stdnum].color = allCard[comCardnum[i]].color;
-				allCard[stdnum].cardObject = allCard[comCardnum[i]].cardObject;
-				allCard[stdnum].cardObject->locate(scene2, 600, 270);
-				allCard[stdnum].cardObject->show();
+				allCard[stdnum] = allCard[comCardnum[i]];
+				stdCard = allCard[stdnum].cardObject;
+				stdCard->locate(scene2, 600, 270);
+				stdCard->show();
 
 				keptComCard[comNull - 1]->hide();
 
