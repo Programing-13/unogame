@@ -493,17 +493,17 @@ void end_game() { //게임 종료 화면
 	restart->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 
 		scene1->enter();
-		start->locate(scene1, 720, 100);
+		start->locate(scene1, 600, 100);
 
 		restart->hide();
 		endbtn->hide();
 		randomcard->hide();
 
 		for (int i = 0; i < myNull; i++) {
-			allCard[myCardnum[i]].cardObject->hide();
+			mycard[i]->hide();
 		}
 		for (int i = 0; i < comNull; i++) {
-			allCard[comCardnum[i]].cardObject->hide();
+			comcard[i]->hide();
 		}
 
 
