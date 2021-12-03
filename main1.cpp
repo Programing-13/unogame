@@ -276,6 +276,7 @@ void com_play() {
 	for (int i = 0; i < comNull; i++) { //색과 숫자가 모두 다르면
 		if(allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color)
 			T++;
+			my_play(); //플레이어에게 턴을 넘김
 	}
 	if (T == comNull) { //한장 가져간다.
 		if (comNull == 14) { //14장 넘어가면 게임종료
@@ -333,13 +334,13 @@ void com_play() {
 	T = 0;
 
 	keepCardCount = 0;
-	my_play(); //플레이어에게 턴을 넘김
 }
 
 
 //  --  숫자나 색깔 다르면 ban이미지 1초 떴다 사라지기, 같으면 기준카드로 바꾸기
 void ban_card() {
-	ban = Object::create("images/ban.png", scene2, 600, 100, false);
+	ban = Object::create("images/ban.png", scene2, 300, 300, false); // 고침
+	ban->setScale(0.05f);
 
 	timer1->setOnTimerCallback([&](TimerPtr)->bool {
 		timer1->set(0.1f);
