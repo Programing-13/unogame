@@ -254,13 +254,17 @@ void my_play() {
 
 	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		printf("mynull : %d ", myNull);
-
+		
 		if (myNull == 14) {
+			bgm->stop();
+			playerTimer->stop();
+			lose->play();
 			showMessage("You Lose..");
 			end_game();
 		}
 
 		else { //가져온 카드가 없다면 카드 가져올수있도록
+			playerTimer->stop();
 			mycard[myNull] = randomCard[nextCard - 15];
 
 			if (myNull < 7)
@@ -278,7 +282,8 @@ void my_play() {
 
 			myNull++;
 			nextCard++;
-
+			
+			com_play();
 		}
 
 		return true;
@@ -304,14 +309,18 @@ void my_play() {
 					myCardnum[i] = myCardnum[i + 1];
 					mycard[i] = allCard[myCardnum[i]].cardObject;
 				}
-				
+
 				myNull--;
 
 				if (myNull == 1) {		//한장 남으면 우노 외침
+					playerTimer->stop();
 					uno = true;
 					press_uno();
 				}
-				else if (myNull == 0) {		//카드를 모두 내면 이김
+				else if (myNull == 0) {	//카드를 모두 내면 이김
+					playerTimer->stop();
+					bgm->stop();
+					win->play();
 					showMessage("You Win!!");
 					end_game();
 				}
@@ -340,9 +349,9 @@ void my_play() {
 	}
 
 	nextbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-		/*playerTimer->stop();
+		playerTimer->stop();
 		hideTimer();
-		playerTimer->set(15.f);*/
+		playerTimer->set(15.f);
 		nextbtn->hide();
 		com_play();
 
@@ -350,10 +359,6 @@ void my_play() {
 		return true;
 		});
 
-	if (myNull == 1) {
-		uno = true;
-		press_uno();
-	}
 }
 
 void com_play() {
@@ -383,6 +388,7 @@ void com_play() {
 
 			comNull++;
 			nextCard++; //comcard의 개수와 다음 뒤집을 카드 넘버 1씩 증가
+			playerTimer->set(15.f);
 			my_play();
 		}
 	}
@@ -433,43 +439,60 @@ void com_play() {
 //  --  숫자나 색깔 다르면 ban이미지 1초 떴다 사라지기, 같으면 기준카드로 바꾸기
 void ban_card() {
 	ban = Object::create("images/ban.png", scene2, 550, 150, false);
+	banTimer = Timer::create(1.f);
 	ban->setScale(0.1f);
 	ban->show();
-	banTimer = Timer::create(1.f);
 	banTimer->start();
 	banTimer->setOnTimerCallback([&](TimerPtr)->bool {
 		ban->hide();
 		return true;
 		});
+	
 }
 
 void press_uno() {
-	unobtn = Object::create("images/unobtn.png", scene2, 300, 300, false);
+	unobtn = Object::create("images/unobtn.png", scene2, 1000, 20, false);
 	unoTimer = Timer::create(3.f);
+	unobtn->setScale(0.2f);
+	unobtn->show();
 
-	if (uno == true) {
-		unobtn->show();
-		unoTimer->start();		// 3초 안에 우노 버튼 눌러야 함
-	}
-
+	showTimer(unoTimer);
+	unoTimer->start();		// 3초 안에 우노 버튼 눌러야 함
+	
 	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+		unoTimer->stop();
 		unobtn->hide();
 		unoeffect->play();
 		showMessage("UNO!");
 		uno = false;
+		showTimer(playerTimer);
+		com_play();
 		return true;
 		});
 
 	unoTimer->setOnTimerCallback([&](TimerPtr)->bool {
-		if (uno == true) {                                       // 3초 지나고도 버튼이 눌리지 않은 상태
+		if (uno == true) {    // 3초 지나고도 버튼이 눌리지 않은 상태
+			unobtn->hide();
+			cardslide->play();
 			mycard[myNull] = randomCard[nextCard - 15];
 
-			if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-			else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
+			if (myNull < 7)
+			{
+				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+				mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
+			}
+			else
+			{
+				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+				mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
+			}
+			mycard[myNull]->setScale(0.8f);
 			mycard[myNull]->show();
 
 			myNull++;
 			nextCard++;
+			showTimer(playerTimer);
+			com_play();
 		}
 
 		return true;
@@ -478,6 +501,8 @@ void press_uno() {
 }
 
 void end_game() { //게임 종료 화면
+	bgm->stop();
+
 	restart = Object::create("images/restartbtn.png", scene2, 370, 350); // 재도전버튼
 	endbtn = Object::create("images/endbtn.png", scene2, 720, 350); // 끝내기버튼
 	restart->setScale(0.8f);
@@ -491,7 +516,7 @@ void end_game() { //게임 종료 화면
 		});
 
 	restart->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-
+		hideTimer();
 		scene1->enter();
 		start->locate(scene1, 600, 100);
 
