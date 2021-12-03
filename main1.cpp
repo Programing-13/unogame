@@ -253,6 +253,7 @@ void my_play() {
 				stdCard->hide();
 				stdnum = myCardnum[i];
 				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
+				stdCard->setScale(1.0f);
 				stdCard->locate(scene2, 600, 270);
 				stdCard->show();
 
