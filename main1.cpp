@@ -295,7 +295,7 @@ void my_play() {
 				stdnum = myCardnum[i];
 				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
 				stdCard->locate(scene2, 600, 270);
-				stdCard->setScale(1.1f);
+				stdCard->setScale(1.0f);
 				stdCard->show();
 				nextbtn->show();
 
@@ -303,6 +303,17 @@ void my_play() {
 				for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
 					myCardnum[i] = myCardnum[i + 1];
 					mycard[i] = allCard[myCardnum[i]].cardObject;
+				}
+				
+				myNull--;
+
+				if (myNull == 1) {		//한장 남으면 우노 외침
+					uno = true;
+					press_uno();
+				}
+				else if (myNull == 0) {		//카드를 모두 내면 이김
+					showMessage("You Win!!");
+					end_game();
 				}
 			}
 			//else if (allCard[stdnum].color == allCard[myCardnum[i]].color)
@@ -323,9 +334,7 @@ void my_play() {
 			//	}
 			//}
 
-			else {
-				ban_card();
-			}
+			else ban_card();
 			return true;
 			});
 	}
