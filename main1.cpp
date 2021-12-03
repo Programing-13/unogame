@@ -219,49 +219,78 @@ void play_game()
 
 
 void my_play() {
-	if (takeCardCount == 0) { //카드 가져오기=>이전에 카드를 내지 않았을 때
-		randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
 
-			if (myNull == 14) {
-				showMessage("You Lose..");
-				end_game();
+	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+		printf("mynull : %d ", myNull);
+
+		if (myNull == 14) {
+			showMessage("You Lose..");
+			end_game();
+		}
+
+		else { //가져온 카드가 없다면 카드 가져올수있도록
+			mycard[myNull] = randomCard[nextCard - 15];
+
+			if (myNull < 7)
+			{
+				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+				mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
 			}
-
-			else if (keepCardCount == 0) { //가져온 카드가 없다면 카드 가져올수있도록
-				mycard[myNull] = randomCard[nextCard - 15];
-
-				if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
-				else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-				mycard[myNull]->setScale(0.8f);
-				mycard[myNull]->show();
-
-				myNull++;
-				nextCard++;
-
-				keepCardCount = 1; //end_game이 오류없이 잘 작동하면 주석 풀기.
-				com_play();
+			else
+			{
+				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+				mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
 			}
+			mycard[myNull]->setScale(0.8f);
+			mycard[myNull]->show();
 
-			return true;
-			});
-	}
+			myNull++;
+			nextCard++;
 
-	for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨
+		}
+
+		return true;
+		});
+
+
+	for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨 // 여기가 문제임
 		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
+			printf("%d ", myCardnum[i]);
 			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
 			{
+				printf("stdnum: %d cardnum: %d", stdnum, myCardnum[i]);
 				stdCard->hide();
 				stdnum = myCardnum[i];
 				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
-				stdCard->setScale(1.0f);
 				stdCard->locate(scene2, 600, 270);
+				stdCard->setScale(1.1f);
 				stdCard->show();
+				nextbtn->show();
+
 
 				for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
 					myCardnum[i] = myCardnum[i + 1];
 					mycard[i] = allCard[myCardnum[i]].cardObject;
 				}
 			}
+			//else if (allCard[stdnum].color == allCard[myCardnum[i]].color)
+			//{
+			//	printf("stdnum: %d cardnum: %d", stdnum, myCardnum[i]);
+			//	stdCard->hide();
+			//	stdnum = myCardnum[i];
+			//	stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
+			//	stdCard->locate(scene2, 600, 270);
+			//	stdCard->setScale(1.1f);
+			//	stdCard->show();
+			//	nextbtn->show();
+
+
+			//	for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
+			//		myCardnum[i] = myCardnum[i + 1];
+			//		mycard[i] = allCard[myCardnum[i]].cardObject;
+			//	}
+			//}
 
 			else {
 				ban_card();
@@ -269,6 +298,17 @@ void my_play() {
 			return true;
 			});
 	}
+
+	nextbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+		/*playerTimer->stop();
+		hideTimer();
+		playerTimer->set(15.f);*/
+		nextbtn->hide();
+		com_play();
+
+
+		return true;
+		});
 }
 
 void com_play() {
