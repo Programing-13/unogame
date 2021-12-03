@@ -232,7 +232,7 @@ void my_play() {
 
 				if (myNull < 7) mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
 				else mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-				mycard[i]->setScale(0.8f);
+				mycard[myNull]->setScale(0.8f);
 				mycard[myNull]->show();
 
 				myNull++;
@@ -302,7 +302,7 @@ void com_play() {
 			if (allCard[stdnum].num == allCard[comCardnum[i]].num || allCard[stdnum].color == allCard[comCardnum[i]].color) {
 		
 				stdCard->hide();
-				allCard[stdnum] = allCard[comCardnum[i]];
+				stdnum = comCardnum[i];
 				stdCard = allCard[stdnum].cardObject;
 				stdCard->locate(scene2, 600, 270);
 				stdCard->show();
