@@ -243,12 +243,14 @@ void my_play() {
 		}
 
 		else { //가져온 카드가 없다면 카드 가져올수있도록
-			mycard[myNull] = randomCard[nextCard - 15];
+
+			myCardnum[myNull] = randomnum[nextCard - 15];
+
 
 			if (myNull < 7)
 			{
 				mycard[myNull] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-				mycard[myNull]->locate(scene2, 150 + 150 * myNull, 60);
+				mycard[myNull]->locate(scene2, index_to_x(1, myNull), 60);
 			}
 			else
 			{
