@@ -372,7 +372,8 @@ void com_play() {
         }
         else {
             cardslide->play();
-            allCard[comCardnum[comNull]] = allCard[mixCard[nextCard]];  //카드 더미에서 한장 가져감
+            comCardnum[comNull] = randomnum[nextCard - 15];
+			comcard[comNull] = allCard[comCardnum[comNull]].cardObject;	//카드 더미에서 한장 가져감
 
             if (comNull < 7) keptComCard[comNull]->locate(scene2, 150 + 150 * comNull, 500);
             else keptComCard[comNull]->locate(scene2, 225 + 150 * (comNull - 7), 540);
