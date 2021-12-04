@@ -239,6 +239,7 @@ void play_game()
 
 }
 void locateKeepCard(int num) {
+    myCardnum[myNull] = randomnum[nextCard - 15]; // 고친거
     mycard[num] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
 
     printf("\n");
@@ -252,9 +253,6 @@ void locateKeepCard(int num) {
 }
 
 void keepCard() {       //플레이어: 카드 가져오기
-    myCardnum[myNull] = randomnum[nextCard - 15];
-    printf("selectedCardnum[%d] = %d", keepCardCount, seledtedCardnum[keepCardCount]);
-    printf("\n");
     if (takeCardCount <= keepCardCount) {
         locateKeepCard(myNull);
         printf("mynull : %d\n", myNull);
