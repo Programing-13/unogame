@@ -24,8 +24,12 @@ int comNull = 7, myNull = 7; //각자 카드의 개수, mycard[]와 comcard[]의
 int mixCard[numOfCard]; //순서 섞은 카드 배열
 int nextCard = 15; //다음에 뒤집을 카드 넘버
 
-bool takeCardCount = 0; //플레이어가 카드를 냈는지 구분 -> 안 냈으면 0
-bool keepCardCount = 0; //플레이어가 카드를 가져왔는지 -> 안 가져왔으면 0
+int seledtedCardnum[20]; //클릭한 카드 넘버 저장
+int takeCardCount = 0; //플레이어가 카드를 낸 횟수
+int keepCardCount = 0; //플레이어가 카드를 가져온 횟수
+
+bool tookCard = 0; //플레이어가 카드를 냈는지 -> 안 냈으면 0
+bool keptCard = 0; //플레이어가 카드를 가져왔는지 -> 안 가져왔으면 0
 bool uno = false;
 
 enum COL { red, green, blue, yellow };
@@ -117,8 +121,8 @@ void init_game() {
 void setClassMem() {
 	for (int i = 0; i < numOfCard; i++) { //멤버 num 설정
 		if (i < 10) allCard[i].color = red;
-		else if (i > 9 && i < 20) allCard[i].color = yellow;
-		else if (i > 19 && i < 30) allCard[i].color = green;
+		else if (10 <= i && i < 20) allCard[i].color = yellow;
+		else if (19 <= i && i < 30) allCard[i].color = green;
 		else allCard[i].color = blue;
 	}
 	for (int i = 0; i < numOfCard; i++) { //멤버 color 설정
@@ -170,18 +174,22 @@ int index_to_x(int who, int index) { //카드판 x 위치 지정 함수
 void random_card()
 {
 	random(mixCard); //mixCard[40]에 랜덤 숫자 40개 저장, 0~6:mycard, 7~13:comcard, 14:첫번째 stdcard
-
-
+	
+		for (int i = 0; i < 40; i++) {
+			printf("mixcard[%d] = %d ", i, mixCard[i]);
+		}
+		printf("\n");
 	for (int i = 0; i < 7; i++)
 	{
-		printf("%d ", mixCard[i]);
 		myCardnum[i] = mixCard[i]; //mixCard의 i번째 랜덤숫자를 myCardnum[i]에 대입
 		mycard[i] = allCard[myCardnum[i]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
 		mycard[i]->locate(scene2, index_to_x(1, i), 140); //저장한 객체멤버의 위치 조정
 		mycard[i]->show(); //객체멤버 보이기
-
+			printf("myCardnum[%d] = %d ", i, myCardnum[i]);
+			printf("\n");
 		comCardnum[i] = mixCard[i + 7]; //mixCard의 i번째 랜덤숫자를 comCardnum[i]에 대입
-
+			printf("comCardnum[%d] = %d ", i, comCardnum[i]);
+			printf("\n");
 		keptComCard[i]->locate(scene2, index_to_x(0, i), 500);
 		keptComCard[i]->show();
 
@@ -191,19 +199,20 @@ void random_card()
 	stdCard = allCard[stdnum].cardObject;
 	stdCard->locate(scene2, 600, 310);
 	stdCard->show();
-
+		printf("stdnum = %d ", stdnum);
+		printf("\n");
 	for (int i = 0; i < 25; i++) { //랜덤카드더미
 		randomnum[i] = mixCard[15 + i];
 		randomCard[i] = allCard[randomnum[i]].cardObject;
-		//	randomCard[i]->hide();
-
+			printf("randomnum[%d] = %d ", i, randomnum[i]);
+			printf("\n");
 	}
 }
 
 void random(int card[numOfCard]) { // 첫 카드 섞을때
 	srand((unsigned int)time(NULL));
 
-	for (int i = 1; i < 40; i++) {
+	for (int i = 0; i < 40; i++) {
 		//랜덤한 수 생성
 		card[i] = rand() % numOfCard;
 		// 예송 수정 -- 카드 7장 다 나오게
@@ -228,19 +237,31 @@ void play_game()
 
 
 }
+void locateKeepCard(int num) {
+	mycard[num] = allCard[myCardnum[myNull]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+	
+	printf("\n");
+	if (num < 7)
+		mycard[num]->locate(scene2, index_to_x(1, num), 140);
+	else           
+		mycard[num]->locate(scene2, 225 + 150 * (num - 7), 20);
 
+	mycard[num]->setScale(0.8f);
+	mycard[num]->show();
+}
 void keepCard() {		//플레이어: 카드 가져오기
-	allCard[myCardnum[myNull]] = allCard[mixCard[nextCard]];
-	mycard[myNull] = allCard[myCardnum[myNull]].cardObject;
+	myCardnum[myNull] = randomnum[nextCard - 15];
+	printf("selectedCardnum[%d] = %d", keepCardCount, seledtedCardnum[keepCardCount]);
+	printf("\n");
+	if (takeCardCount <= keepCardCount) {
+		locateKeepCard(myNull);
+	}
+	else { 
+		locateKeepCard(seledtedCardnum[keepCardCount]);
+	}
 
-	if (myNull < 7)	//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-		mycard[myNull]->locate(scene2, 150 + 150 * myNull, 140);
-	else            //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-		mycard[myNull]->locate(scene2, 225 + 150 * (myNull - 7), 20);
-
-	mycard[myNull]->setScale(0.8f);
-	mycard[myNull]->show();
-
+	keptCard = 1;
+	keepCardCount++;
 	myNull++;
 	nextCard++;
 
@@ -251,8 +272,7 @@ void my_play() {
 
 	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
 	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-		printf("mynull : %d ", myNull);
-
+		
 		if (myNull == 14) {
 			bgm->stop();
 			lose->play();
@@ -260,9 +280,8 @@ void my_play() {
 			end_game();
 		}
 
-		else { //카드 가져오기
-			keepCard();
-		}
+		else if(tookCard == 0) keepCard();	//이전에 카드를 내지 않았으면 카드 가져오기
+		
 
 		return true;
 		});
@@ -270,10 +289,10 @@ void my_play() {
 
 	for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨 // 여기가 문제임
 		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
-			printf("%d ", myCardnum[i]);
+				printf("selected myCardnum = %d, stdnum = %d", myCardnum[i], stdnum);
+				printf("\n");
 			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
 			{
-				printf("stdnum: %d cardnum: %d", stdnum, myCardnum[i]);
 				stdCard->hide();
 				stdnum = myCardnum[i];
 				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
@@ -281,22 +300,28 @@ void my_play() {
 				stdCard->setScale(0.8f);
 				stdCard->show();
 				nextbtn->show();
-
+					printf("changed stdnum = %d", stdnum);
+					printf("\n");
 				myNull--;
-				takeCardCount = 1;
+				tookCard = 1;
 				
+				seledtedCardnum[takeCardCount] = i;	//선택한 카드의 mycard 배열 넘버를 저장 
+				takeCardCount++;
+				/*
 				for (int j = 0; j < myNull - i; j++) { //갖고 있던 카드들 배열 앞으로 땡기기
-					myCardnum[i] = myCardnum[i + 1];
-					mycard[i] = allCard[myCardnum[i]].cardObject;
+					myCardnum[i + j] = myCardnum[i + j + 1];
+					printf("pulled myCardnum = %d", myCardnum[i + j]);
+					printf("\n");					
 				}
 				for (int j = 0; j < myNull; j++) {
-					if (j < 7)	//myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-						mycard[j]->locate(scene2, 150 + 150 * j, 140);
-					else            //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
+					mycard[j] = allCard[myCardnum[j]].cardObject;
+
+					if (j < 7)			//윗줄 채우기
+						mycard[j]->locate(scene2, 150 + 150 * (j), 140);
+					else					//아랫줄 채우기
 						mycard[j]->locate(scene2, 225 + 150 * (j - 7), 20);
 				}
-				
-		
+		*/
 				if (myNull == 1) {		//한장 남으면 우노 외침
 					nextbtn->hide();
 					press_uno();
@@ -328,7 +353,6 @@ void my_play() {
 }
 
 void com_play() {
-	nextbtn->hide();
 	int T = 0;
 	for (int i = 0; i < comNull; i++) { //색과 숫자가 모두 다르면
 		if (allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color)
@@ -354,8 +378,8 @@ void com_play() {
 
 			comNull++;
 			nextCard++; //comcard의 개수와 다음 뒤집을 카드 넘버 1씩 증가
-		
-			my_play();
+			tookCard = 0;
+			keptCard = 0;
 		}
 	}
 	else {
@@ -394,11 +418,12 @@ void com_play() {
 		else showMessage(countMessage);
 
 		count = 0;
+		tookCard = 0;
+		keptCard = 0;
 	}
 
 	T = 0;
 
-	keepCardCount = 0;
 }
 
 
