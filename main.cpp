@@ -12,7 +12,7 @@ using namespace std;
 #define numOfCard 40
 
 ScenePtr scene1, scene2, scene3, scene4;
-ObjectPtr start, back, randomcard, nextbtn, endbtn, restart, help, ban, unobtn, keptComCard[14];
+ObjectPtr start, back, randomcard, nextbtn, endbtn, restart, help, ban, unobtn, keptComCard[14], hide;
 TimerPtr banTimer, unoTimer;
 SoundPtr bgm, unoeffect, cardshare, cardslide, win, lose;
 
@@ -275,7 +275,7 @@ void keepCard() {		//플레이어: 카드 가져오기
 
 void my_play() {
 
-	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
+	nextbtn = Object::create("images/next.png", scene2, 200, 280, false);
 	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 
 		if (myNull == 14) {
@@ -494,14 +494,11 @@ void ban_card() {
 }
 
 void press_uno() {
+	hide = Object::create("images/hide.png", scene2, 0, 0);
 	unobtn = Object::create("images/unobtn.png", scene2, 1000, 20, false);
 	unoTimer = Timer::create(3.f);
 	unobtn->setScale(0.2f);
 	unobtn->show();
-
-	for (int i = 0; i < 7; i++) {
-		mycard[i]->hide();
-	}
 
 	showTimer(unoTimer);
 	unoTimer->start();      // 3초 안에 우노 버튼 눌러야 함
@@ -516,10 +513,7 @@ void press_uno() {
 		unoeffect->play();
 		uno = false;
 
-		for (int i = 0; i < 7; i++) {
-			mycard[i]->show();
-		}
-
+		hide->hide();
 		nextbtn->show();
 		return true;
 		});
@@ -533,9 +527,7 @@ void press_uno() {
 
 			cardslide->play();
 
-			for (int i = 0; i < 7; i++) {
-				mycard[i]->show();
-			}
+			hide->hide();
 
 			keepCard();
 
