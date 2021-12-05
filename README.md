@@ -1,7 +1,7 @@
 Group 10 박정화, 신예송, 황보소영
 
 게임 소개 영상 
-
+https://youtu.be/rImJBiPBogs
 
 <img width="842" alt="스크린샷 2021-12-05 오후 7 42 28" src="https://user-images.githubusercontent.com/76938654/144743242-f6d55f60-e59d-43b2-a8e0-c67ad2988b1c.png">
 
