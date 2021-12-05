@@ -551,10 +551,21 @@ void end_game() { //게임 종료 화면
 		restart->hide();
 		endbtn->hide();
 		randomcard->hide();
+		nextbtn->hide();
 
-		for (int i = 0; i < myNull + keepCardCount; i++) {
-			mycard[i]->hide();
+		if (myNull == 14)
+		{
+			for (int i = 0; i < myNull; i++) {
+				mycard[i]->hide();
+			}
 		}
+		else
+		{
+			for (int i = 0; i < myNull+keepCardCount; i++) {
+				mycard[i]->hide();
+			}
+		}
+
 		for (int i = 0; i < comNull; i++) {
 			keptComCard[i]->hide();
 		}
