@@ -496,7 +496,7 @@ void end_game() { //게임 종료 화면
 		endbtn->hide();
 		randomcard->hide();
 
-		for (int i = 0; i < myNull; i++) {
+		for (int i = 0; i < myNull+keepCardCount; i++) {
 			mycard[i]->hide();
 		}
 		for (int i = 0; i < comNull; i++) {
