@@ -261,12 +261,9 @@ void locateKeepCard(int num) {
 void keepCard() {       //플레이어: 카드 가져오기
     if (takeCardCount <= keepCardCount) {
         locateKeepCard(myNull);
-        printf("mynull : %d\n", myNull);
-        printf("same\n");
     }
     else {
         locateKeepCard(seledtedCardnum[keepCardCount]);
-        printf("different\n");
     }
 
     keptCard = 1;
@@ -292,21 +289,14 @@ void my_play() {
         }
 
         else if (tookCard == 0) keepCard();  //이전에 카드를 내지 않았으면 카드 가져오기
-	
-	    for (int i = 0; i < myNull; i++) {
-			printf("myCardnum[%d] = %d ", i, myCardnum[i]);
-			printf("\n");
-		}
 
         return true;
         });
 
 
-    for (int i = 0; i < myNull; i++) {  // 문제 없이 출력됨 // 여기가 문제임
+    for (int i = 0; i < myNull + takeCardCount; i++) {  // 아랫줄 카드 클릭 수정 부분
         mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
-            printf("selected myCardnum = %d", myCardnum[i]);
-            printf("\n");
-            if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
+       	  if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
             {
                 stdCard->hide();
                 stdnum = myCardnum[i];
@@ -337,11 +327,7 @@ void my_play() {
             }
 
             else ban_card();
-		
-		for (int i = 0; i < myNull; i++) {
-				printf("myCardnum[%d] = %d ", i, myCardnum[i]);
-				printf("\n");
-			}
+
             return true;
             });
     }
