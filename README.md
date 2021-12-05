@@ -1,6 +1,7 @@
 Group 10 박정화, 신예송, 황보소영
 
 게임 소개 영상 
+![image (5)](https://user-images.githubusercontent.com/76938654/144743226-0a3e6cd5-6de5-474d-8314-c4b7f64c0ae7.png)
 
 # UNO
 
