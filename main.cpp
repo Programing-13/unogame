@@ -294,7 +294,7 @@ void my_play() {
         });
 
 
-    for (int i = 0; i < myNull + takeCardCount; i++) {  // 아랫줄 카드 클릭 수정 부분
+    for (int i = 0; i < myNull + keepCardCount; i++) {  // 아랫줄 카드 클릭 수정 부분
         mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
        	  if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
             {
