@@ -348,7 +348,6 @@ void com_play() {
 	for (int i = 0; i < comNull; i++) { //색과 숫자가 모두 다르면
 		if (allCard[stdnum].num != allCard[comCardnum[i]].num && allCard[stdnum].color != allCard[comCardnum[i]].color)
 			T++;
-		my_play();
 	}
 	if (T == comNull) { //한장 가져간다.
 		if (comNull == 14) { //14장 넘어가면 게임종료
