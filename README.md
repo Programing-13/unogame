@@ -16,3 +16,7 @@ ENJOY YOUR GAME!
 
 # 게임소개
 
+<img width="773" alt="스크린샷 2021-12-05 오후 7 43 39" src="https://user-images.githubusercontent.com/76938654/144743271-9816eb3c-82df-49d7-b452-f5effd92d066.png">
+
+Help 를 통해 게임규칙에 대한 설명을 읽어볼 수 있습니다.
+
