@@ -30,6 +30,7 @@ int keepCardCount = 0; //플레이어가 카드를 가져온 횟수
 
 bool tookCard = 0; //플레이어가 카드를 냈는지 -> 안 냈으면 0
 bool keptCard = 0; //플레이어가 카드를 가져왔는지 -> 안 가져왔으면 0
+bool turn = 0; //플레이어 턴 = 0, 컴퓨터 턴 = 1
 bool uno = false;
 
 enum COL { red, green, blue, yellow };
@@ -90,7 +91,7 @@ int main()
 		start->locate(scene3, 1050, 550);
 		return true;
 		});
-	
+
 	init_game();
 	startGame(scene1);
 
@@ -106,7 +107,7 @@ void init_game() {
 	}
 
 	setClassMem();
-	
+
 	back->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
 		cardshare->play();
 		play_game();
@@ -174,11 +175,11 @@ int index_to_x(int who, int index) { //카드판 x 위치 지정 함수
 void random_card()
 {
 	random(mixCard); //mixCard[40]에 랜덤 숫자 40개 저장, 0~6:mycard, 7~13:comcard, 14:첫번째 stdcard
-	
-		for (int i = 0; i < 40; i++) {
-			printf("mixcard[%d] = %d ", i, mixCard[i]);
-		}
-		printf("\n");
+
+	for (int i = 0; i < 40; i++) {
+		printf("mixcard[%d] = %d ", i, mixCard[i]);
+	}
+	printf("\n");
 	for (int i = 0; i < 7; i++)
 	{
 		myCardnum[i] = mixCard[i]; //mixCard의 i번째 랜덤숫자를 myCardnum[i]에 대입
@@ -187,7 +188,7 @@ void random_card()
 		mycard[i]->show(); //객체멤버 보이기
 
 		comCardnum[i] = mixCard[i + 7]; //mixCard의 i번째 랜덤숫자를 comCardnum[i]에 대입
-		
+
 		keptComCard[i]->locate(scene2, index_to_x(0, i), 500);
 		keptComCard[i]->show();
 
@@ -197,13 +198,13 @@ void random_card()
 	stdCard = allCard[stdnum].cardObject;
 	stdCard->locate(scene2, 600, 310);
 	stdCard->show();
-		printf("stdnum = %d ", stdnum);
-		printf("\n");
+	printf("stdnum = %d ", stdnum);
+	printf("\n");
 	for (int i = 0; i < 25; i++) { //랜덤카드더미
 		randomnum[i] = mixCard[15 + i];
 		randomCard[i] = allCard[randomnum[i]].cardObject;
-			printf("randomnum[%d] = %d ", i, randomnum[i]);
-			printf("\n");
+		printf("randomnum[%d] = %d ", i, randomnum[i]);
+		printf("\n");
 	}
 }
 
@@ -231,29 +232,34 @@ void play_game()
 
 	random_card();
 	showMessage("나부터 플레이합니다.");
-	my_play();
 
+	my_play();
+	
+}
+
+void whosTurn() {
+	
+		if (turn == 0) my_play();
+		else com_play();
 
 }
 void locateKeepCard(int num) {
 	myCardnum[num] = randomnum[nextCard - 15];
 	mycard[num] = allCard[myCardnum[num]].cardObject; //myplay번째 카드객체의 Object를 mycard배열 i번째에 저장
-	
-	printf("\n");
+
 	if (num < 7)
 		mycard[num]->locate(scene2, index_to_x(1, num), 140);
-	else           
+	else
 		mycard[num]->locate(scene2, 225 + 150 * (num - 7), 20);
 
 	mycard[num]->setScale(0.8f);
 	mycard[num]->show();
 }
 void keepCard() {		//플레이어: 카드 가져오기
-	printf("takeCardCount = %d\nkeepCardCount = %d", takeCardCount, keepCardCount);
 	if (takeCardCount > keepCardCount) {
 		locateKeepCard(seledtedCardnum[keepCardCount]);
 	}
-	else { 
+	else {
 		locateKeepCard(myNull);
 	}
 
@@ -262,14 +268,16 @@ void keepCard() {		//플레이어: 카드 가져오기
 	myNull++;
 	nextCard++;
 
-	com_play();
+	turn = 1;
+	whosTurn();
+	//		com_play();
 }
 
 void my_play() {
-	
+
 	nextbtn = Object::create("images/next.png", scene2, 200, 270, false);
 	randomcard->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-		
+
 		if (myNull == 14) {
 			bgm->stop();
 			lose->play();
@@ -277,18 +285,18 @@ void my_play() {
 			end_game();
 		}
 
-		else if(tookCard == 0) keepCard();	//이전에 카드를 내지 않았으면 카드 가져오기
-		
-		for (int i = 0; i < 7 + keepCardCount; i++) {
-			printf("myCardnum[%d] = %d ", i, myCardnum[i]);
-			printf("\n");
-		}
+		else if (tookCard == 0) keepCard();	//이전에 카드를 내지 않았으면 카드 가져오기
+
+			for (int i = 0; i < 7 + keepCardCount; i++) {
+				printf("myCardnum[%d] = %d ", i, myCardnum[i]);
+				printf("\n");
+			}
 
 		return true;
 		});
 
 
-	for (int i = 0; i < myNull + keepCardCount; i++) {
+	for (int i = 0; i < 7; i++) {
 		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
 			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
 			{
@@ -299,14 +307,14 @@ void my_play() {
 				stdCard->setScale(0.8f);
 				stdCard->show();
 				nextbtn->show();
-					printf("changed stdnum = %d", stdnum);
-					printf("\n");
+				printf("changed stdnum = %d", stdnum);
+				printf("\n");
 				myNull--;
 				tookCard = 1;
-				
+
 				seledtedCardnum[takeCardCount] = i;	//선택한 카드의 mycard 배열 넘버를 저장 
 				takeCardCount++;
-				
+
 				for (int i = 0; i < 7 + keepCardCount; i++) {
 					printf("myCardnum[%d] = %d ", i, myCardnum[i]);
 					printf("\n");
@@ -325,18 +333,60 @@ void my_play() {
 			}
 
 			else ban_card();
-			
+
+			return true;
+			});
+	}
+	for (int i = 7; i < keepCardCount; i++) {
+		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
+			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
+			{
+				stdCard->hide();
+				stdnum = myCardnum[i];
+				stdCard = allCard[stdnum].cardObject;   // 기준 카드로 바꾸기
+				stdCard->locate(scene2, 600, 310);
+				stdCard->setScale(0.8f);
+				stdCard->show();
+				nextbtn->show();
+				printf("changed stdnum = %d", stdnum);
+				printf("\n");
+				myNull--;
+				tookCard = 1;
+
+				seledtedCardnum[takeCardCount] = i;	//선택한 카드의 mycard 배열 넘버를 저장 
+				takeCardCount++;
+
+				for (int i = 0; i < 7 + keepCardCount; i++) {
+					printf("myCardnum[%d] = %d ", i, myCardnum[i]);
+					printf("\n");
+				}
+
+				if (myNull == 1) {		//한장 남으면 우노 외침
+					uno = true;
+					press_uno();
+				}
+				else if (myNull == 0) {	//카드를 모두 내면 이김
+					bgm->stop();
+					win->play();
+					showMessage("You Win!!");
+					end_game();
+				}
+			}
+
+			else ban_card();
+
 			return true;
 			});
 	}
 
 	nextbtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-	
+
 		hideTimer();
 		nextbtn->hide();
 
-		com_play();
-
+		turn = 1;
+		whosTurn();
+//		com_play();
 
 		return true;
 		});
@@ -373,6 +423,9 @@ void com_play() {
 			tookCard = 0;
 			keptCard = 0;
 
+			turn = 0;
+			whosTurn();
+//			my_play();
 		}
 	}
 	else {
@@ -380,7 +433,7 @@ void com_play() {
 
 		for (int i = 0; i < comNull; i++) { //색과 숫자 중 하나가 같으면
 			if (allCard[stdnum].num == allCard[comCardnum[i]].num || allCard[stdnum].color == allCard[comCardnum[i]].color) {
-				
+
 				cardslide->play();
 				stdCard->hide();
 				stdnum = comCardnum[i];
@@ -405,7 +458,7 @@ void com_play() {
 		}
 		char countMessage[50];
 		sprintf(countMessage, "컴퓨터가 카드를 %d장 냈습니다.", count);
-	
+
 		if (comNull == 0) {
 			bgm->stop();
 			lose->play();
@@ -418,10 +471,13 @@ void com_play() {
 		count = 0;
 		tookCard = 0;
 		keptCard = 0;
+
+		turn = 0;
+		whosTurn();
+//		my_play();
 	}
 
 	T = 0;
-
 }
 //  --  숫자나 색깔 다르면 ban이미지 1초 떴다 사라지기, 같으면 기준카드로 바꾸기
 void ban_card() {
@@ -488,7 +544,7 @@ void end_game() { //게임 종료 화면
 		});
 
 	restart->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
-		
+
 		scene1->enter();
 		bgm->play();
 
@@ -496,7 +552,7 @@ void end_game() { //게임 종료 화면
 		endbtn->hide();
 		randomcard->hide();
 
-		for (int i = 0; i < myNull+keepCardCount; i++) {
+		for (int i = 0; i < myNull + keepCardCount; i++) {
 			mycard[i]->hide();
 		}
 		for (int i = 0; i < comNull; i++) {
