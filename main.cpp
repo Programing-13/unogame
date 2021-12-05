@@ -499,16 +499,27 @@ void press_uno() {
 	unobtn->setScale(0.2f);
 	unobtn->show();
 
+	for (int i = 0; i < 7; i++) {
+		mycard[i]->hide();
+	}
+
 	showTimer(unoTimer);
-	unoTimer->start();		// 3초 안에 우노 버튼 눌러야 함
+	unoTimer->start();      // 3초 안에 우노 버튼 눌러야 함
+
 
 	unobtn->setOnMouseCallback([&](auto, auto, auto, auto)->bool {
+
 		unoTimer->stop();
 		hideTimer();
 		unoTimer->set(3.f);
 		unobtn->hide();
 		unoeffect->play();
 		uno = false;
+
+		for (int i = 0; i < 7; i++) {
+			mycard[i]->show();
+		}
+
 		nextbtn->show();
 		return true;
 		});
@@ -519,16 +530,20 @@ void press_uno() {
 			unoTimer->set(3.f);
 			unobtn->hide();
 			nextbtn->hide();
+
 			cardslide->play();
 
+			for (int i = 0; i < 7; i++) {
+				mycard[i]->show();
+			}
+
 			keepCard();
+
 		}
 
 		return true;
 		});
-
 }
-
 void end_game() { //게임 종료 화면
 	bgm->stop();
 	nextbtn->hide();
