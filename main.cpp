@@ -296,7 +296,7 @@ void my_play() {
 		});
 
 
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < myNull; i++) {
 		mycard[i]->setOnMouseCallback([&, i](auto, auto, auto, auto)->bool {
 			if (allCard[stdnum].num == allCard[myCardnum[i]].num || allCard[stdnum].color == allCard[myCardnum[i]].color)
 			{
@@ -425,7 +425,7 @@ void com_play() {
 
 			turn = 0;
 			whosTurn();
-//			my_play();
+			my_play();
 		}
 	}
 	else {
@@ -474,7 +474,7 @@ void com_play() {
 
 		turn = 0;
 		whosTurn();
-//		my_play();
+		my_play();
 	}
 
 	T = 0;
